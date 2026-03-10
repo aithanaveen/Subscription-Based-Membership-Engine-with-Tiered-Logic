@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cinemania – Stream Everything</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <a class="nav-logo" href="/">🎬 CINEMANIA</a>
+  <div class="nav-links">
+    <a href="/" class="active">Home</a>
+    <a href="pages/movies.html">Movies</a>
+    <a href="pages/series.html">Series</a>
+    <a href="pages/categories.html">Categories</a>
+    <a data-auth="logged-in" href="pages/watchlist.html" class="hidden">My List</a>
+  </div>
+  <div class="nav-right">
+    <button class="nav-search-btn" onclick="openModal('search-modal')">🔍</button>
+    <div data-auth="logged-out">
+      <button class="btn btn-primary btn-sm" onclick="openAuthModal()">Sign In</button>
+    </div>
+    <div data-auth="logged-in" class="hidden" style="display:flex;align-items:center;gap:.6rem">
+      <span id="nav-plan-badge" style="display:none"></span>
+      <div class="avatar-btn">
+        <span class="user-avatar-init">U</span>
+        <div class="avatar-dropdown">
+          <div style="padding:.6rem 1rem .3rem;font-size:.75rem;font-weight:700;color:var(--text3);letter-spacing:.5px">ACCOUNT</div>
+          <div style="padding:.3rem 1rem .6rem;font-size:.8rem;color:var(--text2)" id="dropdown-plan-info">Free Plan</div>
+          <div class="sep"></div>
+          <a href="pages/profile.html">👤 My Profile</a>
+          <a href="pages/watchlist.html">📋 My List</a>
+          <a href="pages/subscription.html">👑 Manage Subscription</a>
+          <div class="sep"></div>
+          <a href="pages/admin.html" id="admin-link" class="hidden">⚙️ Admin Panel</a>
+          <a onclick="api.logout()" style="color:#ef4444">🚪 Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg" id="hero-bg" style="background:url('https://picsum.photos/seed/hero/1920/1080') center/cover no-repeat"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🔥 NOW STREAMING</div>
+    <h1 class="hero-title" id="hero-title">DARK<br><span>HORIZON</span></h1>
+    <div class="hero-meta">
+      <span class="hero-stars">⭐ 4.8</span>
+      <span class="dot"></span><span>2024</span>
+      <span class="dot"></span><span>Action</span>
+      <span class="dot"></span><span>2h 28m</span>
+    </div>
+    <p class="hero-desc" id="hero-desc">A gripping tale of survival where humanity fights for its last remnants of civilization. Every choice matters.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" id="hero-watch-btn" onclick="openDetail(1)">▶ Watch Now</button>
+      <button class="btn btn-secondary" onclick="openDetail(1)">ⓘ More Info</button>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENT SECTIONS -->
+<main>
+  <section class="section">
+    <div class="section-header"><h2 class="section-title">🔥 Trending Now</h2><a class="see-all" href="pages/movies.html">See All →</a></div>
+    <div class="content-row" id="trending-row"><div class="loading-center"><div class="spinner"></div></div></div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><h2 class="section-title">🆕 New Releases</h2><a class="see-all" href="pages/movies.html">See All →</a></div>
+    <div class="content-row" id="new-row"><div class="loading-center"><div class="spinner"></div></div></div>
+  </section>
+
+  <!-- Access tier notice for non-subscribers -->
+  <section class="section" id="tier-notice-section" style="display:none">
+    <div class="tier-notice">
+      <div class="tier-notice-icon">👑</div>
+      <div class="tier-notice-text">
+        <strong>Unlock Premium & Standard Content</strong>
+        <p>Some titles require a subscription. Upgrade your plan to watch everything without restrictions.</p>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openPlansModal()">View Plans →</button>
+    </div>
+  </section>
+
+  <section class="section" id="continue-section" style="display:none">
+    <div class="section-header"><h2 class="section-title">▶ Continue Watching</h2></div>
+    <div class="content-row" id="continue-row"><div class="loading-center"><div class="spinner"></div></div></div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><h2 class="section-title">🎬 Top Movies</h2><a class="see-all" href="pages/movies.html">See All →</a></div>
+    <div class="content-row" id="movies-row"><div class="loading-center"><div class="spinner"></div></div></div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><h2 class="section-title">📺 Web Series</h2><a class="see-all" href="pages/series.html">See All →</a></div>
+    <div class="content-row" id="series-row"><div class="loading-center"><div class="spinner"></div></div></div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div style="background:linear-gradient(135deg,rgba(229,9,20,.12),rgba(139,92,246,.12));border:1px solid rgba(229,9,20,.2);border-radius:24px;padding:3rem;text-align:center">
+      <div style="font-size:3rem;margin-bottom:1rem">🎬</div>
+      <h2 style="font-family:'Bebas Neue';font-size:2.5rem;letter-spacing:2px;margin-bottom:.5rem">PLANS FOR EVERY VIEWER</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;max-width:600px;margin:1.5rem auto">
+        <div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:12px;padding:1rem;text-align:center">
+          <div style="font-size:1.5rem">📺</div><div style="font-weight:700;color:#38bdf8;font-size:.9rem">BASIC</div><div style="color:var(--text2);font-size:.8rem">₹99/mo · HD</div>
+        </div>
+        <div style="background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.2);border-radius:12px;padding:1rem;text-align:center">
+          <div style="font-size:1.5rem">⭐</div><div style="font-weight:700;color:#f5c518;font-size:.9rem">STANDARD</div><div style="color:var(--text2);font-size:.8rem">₹199/mo · FHD</div>
+        </div>
+        <div style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:12px;padding:1rem;text-align:center">
+          <div style="font-size:1.5rem">👑</div><div style="font-weight:700;color:#a78bfa;font-size:.9rem">PREMIUM</div><div style="color:var(--text2);font-size:.8rem">₹499/mo · 4K</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1rem">
+        <button class="btn btn-primary" onclick="openPlansModal()">Choose Your Plan</button>
+        <button class="btn btn-outline" onclick="openAuthModal('register')">Start Free</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><h2 class="section-title">📽 Documentaries</h2></div>
+    <div class="content-row" id="docs-row"><div class="loading-center"><div class="spinner"></div></div></div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer style="padding:3rem 5%;border-top:1px solid var(--border);color:var(--text3);font-size:.85rem;margin-top:2rem">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:2rem;margin-bottom:2rem">
+    <div><div style="font-family:'Bebas Neue';font-size:1.5rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem">🎬 CINEMANIA</div><p style="font-size:.8rem">Stream unlimited entertainment. Plans starting ₹99.</p></div>
+    <div><div style="font-weight:700;color:var(--text2);margin-bottom:.7rem">Navigate</div><div style="display:flex;flex-direction:column;gap:.4rem"><a href="pages/movies.html" style="color:var(--text3);text-decoration:none">Movies</a><a href="pages/series.html" style="color:var(--text3);text-decoration:none">Series</a><a href="pages/categories.html" style="color:var(--text3);text-decoration:none">Categories</a></div></div>
+    <div><div style="font-weight:700;color:var(--text2);margin-bottom:.7rem">Account</div><div style="display:flex;flex-direction:column;gap:.4rem"><a onclick="openAuthModal()" style="color:var(--text3);text-decoration:none;cursor:pointer">Sign In</a><a href="pages/subscription.html" style="color:var(--text3);text-decoration:none">Plans</a></div></div>
+  </div>
+  <div style="border-top:1px solid var(--border);padding-top:1.5rem;text-align:center">© 2024 Cinemania. All rights reserved.</div>
+</footer>
+
+<div id="toast-container"></div>
+
+<!-- ═══════════════════════════════════════════════
+     AUTH MODAL
+     ═══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('auth-modal')">✕</button>
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div style="font-size:2rem;margin-bottom:.5rem">🎬</div>
+      <div class="modal-title">CINEMANIA</div>
+      <div class="modal-subtitle">Your gateway to unlimited entertainment</div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="login">Sign In</button>
+      <button class="tab" data-tab="register">Sign Up</button>
+    </div>
+    <form id="login-form" data-tab-content="login">
+      <div class="form-group"><label class="form-label">Email</label><input type="email" id="login-email" class="form-input" placeholder="your@email.com" required></div>
+      <div class="form-group"><label class="form-label">Password</label><input type="password" id="login-password" class="form-input" placeholder="••••••••" required></div>
+      <button type="submit" class="btn btn-primary full-width" style="margin-top:.5rem">Sign In</button>
+    </form>
+    <form id="register-form" data-tab-content="register" class="hidden">
+      <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="reg-name" class="form-input" placeholder="John Doe" required></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" id="reg-email" class="form-input" placeholder="your@email.com" required></div>
+      <div class="form-group"><label class="form-label">Password</label><input type="password" id="reg-password" class="form-input" placeholder="Min. 6 characters" required minlength="6"></div>
+      <button type="submit" class="btn btn-primary full-width" style="margin-top:.5rem">Create Account</button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     DETAIL MODAL
+     ═══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal detail-modal" style="position:relative">
+    <button class="modal-close" onclick="closeModal('detail-modal')" style="position:fixed;top:1.5rem;right:1.5rem;z-index:99">✕</button>
+    <img class="detail-banner" src="" alt="" style="transition:filter .4s">
+    <div class="detail-banner-overlay"></div>
+    <!-- lock overlay injected by JS -->
+    <div class="detail-content">
+      <h2 class="detail-title"></h2>
+      <div class="detail-meta"></div>
+      <p class="detail-desc"></p>
+      <div class="detail-actions" style="display:flex;gap:1rem;flex-wrap:wrap">
+        <button class="btn btn-primary watch-btn">▶ Watch Now</button>
+        <button class="btn btn-secondary watchlist-btn">+ My List</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PLANS MODAL
+     ═══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="plans-modal">
+  <div class="modal" style="max-width:900px">
+    <button class="modal-close" onclick="closeModal('plans-modal')">✕</button>
+    <div class="modal-title plans-modal-title">CHOOSE YOUR PLAN</div>
+    <div class="modal-subtitle">Unlock more content. Cancel anytime.</div>
+    <div class="plans-grid" id="plans-grid"><div class="loading-center"><div class="spinner"></div></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     UPGRADE MODAL  ← NEW
+     ═══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="upgrade-modal">
+  <div class="modal" style="max-width:820px">
+    <button class="modal-close" onclick="closeModal('upgrade-modal')">✕</button>
+    <div class="upgrade-modal-header">
+      <span class="upgrade-modal-icon">🔒</span>
+      <div class="upgrade-modal-title">Upgrade Required</div>
+      <div class="upgrade-modal-desc">Upgrade your plan to watch this content</div>
+    </div>
+    <div id="upgrade-plans-grid"><div class="loading-center"><div class="spinner"></div></div></div>
+    <div style="text-align:center;margin-top:1.2rem">
+      <a onclick="closeModal('upgrade-modal');openPlansModal()" style="color:var(--text2);font-size:.82rem;cursor:pointer;text-decoration:underline">View full plan comparison →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SEARCH MODAL
+     ═══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="search-modal">
+  <div class="modal" style="max-width:700px">
+    <button class="modal-close" onclick="closeModal('search-modal')">✕</button>
+    <div style="margin-bottom:1.5rem">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" class="search-input" placeholder="Search movies, series, genres...">
+      </div>
+    </div>
+    <div id="search-results" class="content-grid hidden"></div>
+    <div id="search-placeholder" style="text-align:center;padding:2rem;color:var(--text3)">Start typing to search...</div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  // If logged in, re-hydrate subscription into session
+  if (api.isLoggedIn()) {
+    await api.fetchAndStoreSubscription();
+    updateNavUI();
+
+    // Show "continue watching" & hide tier notice for paid users
+    const planLevel = getUserPlanLevel();
+    if (planLevel === 0) {
+      document.getElementById('tier-notice-section').style.display = 'block';
+    }
+    document.getElementById('continue-section').style.display = 'block';
+
+    // Update dropdown plan info
+    const sub = api.subscription();
+    const planName = getUserPlanName();
+    const planIcons = { free:'🆓',basic:'📺',standard:'⭐',premium:'👑' };
+    const el = document.getElementById('dropdown-plan-info');
+    if (el) {
+      if (sub) {
+        const endDate = new Date(sub.end_date).toLocaleDateString('en-IN');
+        el.innerHTML = `${planIcons[planName]||'📺'} <strong style="color:var(--text)">${sub.plan_name}</strong> Plan<br><span style="font-size:.72rem">Expires ${endDate}</span>`;
+      } else {
+        el.innerHTML = `🆓 <strong>Free</strong> Plan &nbsp;<a onclick="closeModal('auth-modal');openPlansModal()" style="color:var(--red2);cursor:pointer;font-size:.75rem">Upgrade →</a>`;
+      }
+    }
+  } else {
+    document.getElementById('tier-notice-section').style.display = 'block';
+  }
+
+  // Load all rows — backend sends has_access per item
+  const loadRow = async (url, rowId) => {
+    try {
+      const raw = await api.get(url);
+      const data = Array.isArray(raw) ? raw : (raw.data || raw);
+      const el = document.getElementById(rowId);
+      if (!el) return;
+      el.innerHTML = data.length
+        ? data.map(makeCard).join('')
+        : '<p style="color:var(--text3);padding:1rem">Nothing here yet</p>';
+    } catch {}
+  };
+
+  // Hero
+  try {
+    const raw = await api.get('/content?featured=true&limit=1');
+    const data = Array.isArray(raw) ? raw : (raw.data || raw);
+    if (data.length) {
+      const h = data[0];
+      const bg = document.getElementById('hero-bg');
+      if (bg) bg.style.backgroundImage = `url('${h.banner_url||h.thumbnail||h.thumbnail_url||"https://picsum.photos/seed/hero/1920/1080"}')`;
+      const ht = document.getElementById('hero-title');
+      if (ht) {
+        const words = h.title.split(' ');
+        ht.innerHTML = words.length > 1
+          ? words[0] + '<br><span>' + words.slice(1).join(' ') + '</span>'
+          : `<span>${h.title}</span>`;
+      }
+      const hd = document.getElementById('hero-desc');
+      if (hd) hd.textContent = h.description || '';
+      // Hook watch button with tiered check
+      const hwb = document.getElementById('hero-watch-btn');
+      if (hwb) {
+        const required = (h.required_plan || 'basic').toLowerCase();
+        const locked = !h.has_access && required !== 'free';
+        if (!api.isLoggedIn()) {
+          hwb.textContent = '🔐 Sign In to Watch'; hwb.onclick = () => openAuthModal();
+        } else if (locked) {
+          const pc = { basic:'#38bdf8',standard:'#f5c518',premium:'#a78bfa' };
+          hwb.textContent = `🔒 Upgrade to Watch`; hwb.onclick = () => openUpgradeModal(required, h.title);
+          hwb.style.background = `linear-gradient(135deg,${pc[required]||'#8b5cf6'}33,${pc[required]||'#8b5cf6'}66)`;
+          hwb.style.border = `1.5px solid ${pc[required]||'#8b5cf6'}`;
+        } else {
+          hwb.textContent = '▶ Watch Now'; hwb.onclick = () => openDetail(h.id);
+        }
+      }
+    }
+  } catch {}
+
+  await Promise.all([
+    loadRow('/content?trending=true&limit=15',   'trending-row'),
+    loadRow('/content?newContent=true&limit=15', 'new-row'),
+    loadRow('/content?type=movie&limit=15',      'movies-row'),
+    loadRow('/content?type=series&limit=15',     'series-row'),
+    loadRow('/content?type=documentary&limit=10','docs-row'),
+  ]);
+
+  if (api.isLoggedIn()) {
+    loadRow('/content/user/history', 'continue-row');
+  }
+});
+</script>
+</body>
+</html>
